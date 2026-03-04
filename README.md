@@ -10,8 +10,8 @@
         * Author
         * List of Comments
     - Functionalities:
-        * Add new book (via rpc)
-        * Add comment to existing book (via rpc)
-        * Remove book by ID (via rpc)
-    - Implement client stream that will send new books for the server via streaming
-    - Implement server stream that will update how is connedted every time new book is added
+        * Add new book (regular req response rpc)
+        * Add comment to existing book (regular rpc)
+        * Remove book by ID (regular rpc)
+    - Implement client stream that will send new books for the server via streaming (server streaming rpc)
+    - Implement server stream that will update how is connedted every time new book is added (client streaming rpc)
