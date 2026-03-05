@@ -2,7 +2,7 @@ using Grpc.Core;
 
 namespace GrpcLibraryServer.Services
 {
-    public class GreeterService(ILogger<GreeterService> logger) : Greeter.GreeterBase
+    public class LibraryService(ILogger<LibraryService> logger) : Library.LibraryBase
     {
         public override Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
         {
