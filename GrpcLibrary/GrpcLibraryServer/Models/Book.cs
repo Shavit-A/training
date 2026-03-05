@@ -4,13 +4,13 @@ namespace GrpcLibraryServer.Models
 {
     public class Book
     {
-        private readonly Int32 _id;
+        private readonly UInt32 _id;
         private readonly string _title;
         private readonly string _author;
         private readonly UInt32 _publication_year;
         private List<string> _reviews;
 
-        public Book(int id, string title, string author, UInt32 publication_year)
+        public Book(UInt32 id, string title, string author, UInt32 publication_year)
         {
             _id = id;
             _title = title;
@@ -24,6 +24,7 @@ namespace GrpcLibraryServer.Models
             _reviews.Add(review);
         }
 
-        public string Titile => _title;
+        public string Title => _title;
+        public UInt32 Id => _id;
     }
 }

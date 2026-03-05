@@ -5,21 +5,23 @@ option csharp_namespace = "GrpcLibraryServer";
 package library;
 
 service Library {
-  rpc AddBook (Book) returns (AddBookResponse);
+  rpc AddBook (Book) returns (Response);
+  rpc AddReviewToBook (AddReviewRequest) returns (Response);
 }
 
 message Book {
-  int32 id = 1;
+  uint32 id = 1;
   string title = 2;
   string author = 3;
   uint32 publication_date = 4;
 }
 
-message AddBookResponse{
+message Response{
 	bool success = 1;
 	string message = 2;
 }
 
-message Review {
-  string review_text = 1;
+message AddReviewRequest {
+  uint32 book_id = 1;
+  string review_text = 2;
 }
