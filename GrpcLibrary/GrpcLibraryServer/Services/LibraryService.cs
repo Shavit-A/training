@@ -7,6 +7,13 @@ namespace GrpcLibraryServer.Services
     public class LibraryService(ILogger<LibraryService> logger) : Library.LibraryBase
     {
         private static List<Models.Book> _books = new List<Models.Book>();
+        private static event Action<Models.Book>? _onBookAdded;
+
+        private void AddBookAndNotify(Models.Book book)
+        {
+            _books.Add(book);
+            _onBookAdded?.Invoke(book);
+        }
 
         public override Task<Response> AddBook(
             Book request,
@@ -16,7 +23,7 @@ namespace GrpcLibraryServer.Services
 
             var newBook = new Models.Book(
                 request.Id, request.Title, request.Author, request.PublicationDate);
-            _books.Add(newBook);
+            AddBookAndNotify(newBook);
 
             return Task.FromResult(new Response
             {
@@ -82,7 +89,7 @@ namespace GrpcLibraryServer.Services
             await foreach (var book in requestStream.ReadAllAsync())
             {
                 var newBook = new Models.Book(book.Id, book.Title, book.Author, book.PublicationDate);
-                _books.Add(newBook);
+                AddBookAndNotify(newBook);
                 count++;
             }
 
@@ -99,28 +106,34 @@ namespace GrpcLibraryServer.Services
             IServerStreamWriter<Response> responseStream,
             ServerCallContext context)
         {
-            int lastSeenCount = _books.Count;
 
-            while (!context.CancellationToken.IsCancellationRequested)
+            var channel = System.Threading.Channels.Channel.CreateUnbounded<Models.Book>();
+
+            Action<Models.Book> bookHandler = (book) =>
             {
-                if (_books.Count <= lastSeenCount)
-                {
-                    await Task.Delay(500);
-                    continue;
-                }
+                channel.Writer.TryWrite(book);
+            };
 
-                for (int i = lastSeenCount; i < _books.Count; i++)
-                {
-                    var newBook = _books[i];
+            _onBookAdded += bookHandler;
 
+            try
+            {
+                await foreach (var book in channel.Reader.ReadAllAsync(context.CancellationToken))
+                {
                     await responseStream.WriteAsync(new Response
                     {
                         Success = true,
-                        Message = $"New book [{newBook.Id}] Title: {newBook.Title}"
+                        Message = $"New book [{book.Id}] Title: {book.Title}"
                     });
                 }
-
-                lastSeenCount = _books.Count;
+            }
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine("Client disconnected from watch stream.");
+            }
+            finally
+            {
+                _onBookAdded -= bookHandler;
             }
         }
     }
