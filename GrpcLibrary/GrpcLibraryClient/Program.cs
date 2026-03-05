@@ -22,5 +22,8 @@ for (uint i = 0; i < 3; i++)
 }
 
 await call.RequestStream.CompleteAsync();
+
+Console.WriteLine("Finished sending bulk of books. Waiting for response...");
+
 var BulkAddBooksResponse = await call.ResponseAsync;
 Console.WriteLine($"Bulk Add Books response - Success status: {BulkAddBooksResponse.Success}, Message: {BulkAddBooksResponse.Message}");

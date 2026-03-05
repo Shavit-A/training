@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="GrpcLibraryClient/GrpcLibraryClient.csproj" Id="3ca3d437-0ea3-49c9-8510-2f636a4341b7" />
   <Project Path="GrpcLibraryServer/GrpcLibraryServer.csproj" />
+  <Project Path="GrpcLibraryWatchClient/GrpcLibraryWatchClient.csproj" Id="201e26e0-df90-48c5-a1b1-c7995ca12385" />
 </Solution>

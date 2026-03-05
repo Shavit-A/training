@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "GrpcLibraryClient";
+option csharp_namespace = "GrpcLibraryWatchClient";
 
 import "google/protobuf/empty.proto";
 
