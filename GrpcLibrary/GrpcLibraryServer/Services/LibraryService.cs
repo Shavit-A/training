@@ -8,7 +8,7 @@ namespace GrpcLibraryServer.Services
 
         public override Task<Response> AddBook(Book request, ServerCallContext context)
         {
-            logger.LogInformation($"The message is received, Book name: {request.Title}");
+            logger.LogInformation($"Add Book name: {request.Title}");
 
             var newBook = new Models.Book(request.Id, request.Title, request.Author, request.PublicationDate);
             _books.Add(newBook);
@@ -22,7 +22,7 @@ namespace GrpcLibraryServer.Services
 
         public override Task<Response> AddReviewToBook(AddReviewRequest request, ServerCallContext context)
         {
-            logger.LogInformation($"The message is received, Book ID: {request.BookId}");
+            logger.LogInformation($"Add Review to Book ID: {request.BookId}");
 
             var book = _books.FirstOrDefault(b => b.Id == request.BookId);
             if (book == null)
@@ -39,6 +39,27 @@ namespace GrpcLibraryServer.Services
             {
                 Success = true,
                 Message = "Review added successfully!"
+            });
+        }
+
+        public override Task<Response> RemoveBook(RemoveBookRequest request, ServerCallContext context)
+        {
+            logger.LogInformation($"Remove Book ID: {request.BookId}");
+            var book = _books.FirstOrDefault(b => b.Id == request.BookId);
+            if (book == null)
+            {
+                return Task.FromResult(new Response
+                {
+                    Success = false,
+                    Message = "Book not found!"
+                });
+            }
+
+            _books.Remove(book);
+            return Task.FromResult(new Response
+            {
+                Success = true,
+                Message = "Book removed successfully!"
             });
         }
     }

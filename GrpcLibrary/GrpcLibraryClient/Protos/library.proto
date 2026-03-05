@@ -7,6 +7,7 @@ package library;
 service Library {
   rpc AddBook (Book) returns (Response);
   rpc AddReviewToBook (AddReviewRequest) returns (Response);
+  rpc RemoveBook (RemoveBookRequest) returns (Response);
 }
 
 message Book {
@@ -24,4 +25,8 @@ message Response{
 message AddReviewRequest {
   uint32 book_id = 1;
   string review_text = 2;
+}
+
+message RemoveBookRequest {
+  uint32 book_id = 1;
 }
