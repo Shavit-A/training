@@ -3,6 +3,7 @@ using GrpcLibraryClient;
 
 using var channel = GrpcChannel.ForAddress("https://localhost:7247");
 var client = new Library.LibraryClient(channel);
+
 var addBookResponse= await client.AddBookAsync(
     new Book { Id = 1, Title = "Title1", Author = "Author1", PublicationDate = 1234 });
 Console.WriteLine($"AddBook response - Success status: {addBookResponse.Success}, Message: {addBookResponse.Message}");
@@ -12,3 +13,14 @@ Console.WriteLine($"Add Review To Book response - Success status: {AddReviewToBo
 
 var RemoveBookResponse = await client.RemoveBookAsync(new RemoveBookRequest { BookId = 1 });
 Console.WriteLine($"Remove Book response - Success status: {RemoveBookResponse.Success}, Message: {RemoveBookResponse.Message}");
+
+using var call = client.BulkAddBooks();
+
+for (uint i = 0; i < 3; i++)
+{
+    await call.RequestStream.WriteAsync(new Book { Id = 1, Title = $"Title{i}", Author = $"Author{i}", PublicationDate = 1000 + i });
+}
+
+await call.RequestStream.CompleteAsync();
+var BulkAddBooksResponse = await call.ResponseAsync;
+Console.WriteLine($"Bulk Add Books response - Success status: {BulkAddBooksResponse.Success}, Message: {BulkAddBooksResponse.Message}");

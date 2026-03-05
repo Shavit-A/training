@@ -8,6 +8,7 @@ service Library {
   rpc AddBook (Book) returns (Response);
   rpc AddReviewToBook (AddReviewRequest) returns (Response);
   rpc RemoveBook (RemoveBookRequest) returns (Response);
+  rpc BulkAddBooks (stream Book) returns (Response);
 }
 
 message Book {
