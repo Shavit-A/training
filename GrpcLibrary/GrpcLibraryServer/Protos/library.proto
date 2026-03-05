@@ -2,6 +2,8 @@ syntax = "proto3";
 
 option csharp_namespace = "GrpcLibraryServer";
 
+import "google/protobuf/empty.proto";
+
 package library;
 
 service Library {
@@ -9,6 +11,7 @@ service Library {
   rpc AddReviewToBook (AddReviewRequest) returns (Response);
   rpc RemoveBook (RemoveBookRequest) returns (Response);
   rpc BulkAddBooks (stream Book) returns (Response);
+  rpc WatchBooks (google.protobuf.Empty) returns (stream Response);
 }
 
 message Book {

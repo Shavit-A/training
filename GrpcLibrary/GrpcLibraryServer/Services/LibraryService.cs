@@ -1,4 +1,6 @@
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using System.Reflection.Metadata.Ecma335;
 
 namespace GrpcLibraryServer.Services
 {
@@ -6,11 +8,14 @@ namespace GrpcLibraryServer.Services
     {
         private static List<Models.Book> _books = new List<Models.Book>();
 
-        public override Task<Response> AddBook(Book request, ServerCallContext context)
+        public override Task<Response> AddBook(
+            Book request,
+            ServerCallContext context)
         {
             logger.LogInformation($"Add Book name: {request.Title}");
 
-            var newBook = new Models.Book(request.Id, request.Title, request.Author, request.PublicationDate);
+            var newBook = new Models.Book(
+                request.Id, request.Title, request.Author, request.PublicationDate);
             _books.Add(newBook);
 
             return Task.FromResult(new Response
@@ -20,7 +25,9 @@ namespace GrpcLibraryServer.Services
             });
         }
 
-        public override Task<Response> AddReviewToBook(AddReviewRequest request, ServerCallContext context)
+        public override Task<Response> AddReviewToBook(
+            AddReviewRequest request,
+            ServerCallContext context)
         {
             logger.LogInformation($"Add Review to Book ID: {request.BookId}");
 
@@ -42,7 +49,9 @@ namespace GrpcLibraryServer.Services
             });
         }
 
-        public override Task<Response> RemoveBook(RemoveBookRequest request, ServerCallContext context)
+        public override Task<Response> RemoveBook(
+            RemoveBookRequest request,
+            ServerCallContext context)
         {
             logger.LogInformation($"Remove Book ID: {request.BookId}");
             var book = _books.FirstOrDefault(b => b.Id == request.BookId);
@@ -63,7 +72,9 @@ namespace GrpcLibraryServer.Services
             });
         }
 
-        public override async Task<Response> BulkAddBooks(IAsyncStreamReader<Book> requestStream, ServerCallContext context)
+        public override async Task<Response> BulkAddBooks(
+            IAsyncStreamReader<Book> requestStream,
+            ServerCallContext context)
         {
             logger.LogInformation("Bulk Add Books started.");
 
@@ -81,6 +92,36 @@ namespace GrpcLibraryServer.Services
                 Success = true,
                 Message = $"Bulk add completed. Total books added: {count}."
             };
+        }
+
+        public override async Task WatchBooks(
+            Empty request,
+            IServerStreamWriter<Response> responseStream,
+            ServerCallContext context)
+        {
+            int lastSeenCount = _books.Count;
+
+            while (!context.CancellationToken.IsCancellationRequested)
+            {
+                if (_books.Count <= lastSeenCount)
+                {
+                    await Task.Delay(500);
+                    continue;
+                }
+
+                for (int i = lastSeenCount; i < _books.Count; i++)
+                {
+                    var newBook = _books[i];
+
+                    await responseStream.WriteAsync(new Response
+                    {
+                        Success = true,
+                        Message = $"New book [{newBook.Id}] Title: {newBook.Title}"
+                    });
+                }
+
+                lastSeenCount = _books.Count;
+            }
         }
     }
 }
