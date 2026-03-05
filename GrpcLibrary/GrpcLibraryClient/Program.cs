@@ -16,9 +16,9 @@ Console.WriteLine($"Remove Book response - Success status: {RemoveBookResponse.S
 
 using var call = client.BulkAddBooks();
 
-for (uint i = 0; i < 3; i++)
+for (uint i = 2; i < 5; i++)
 {
-    await call.RequestStream.WriteAsync(new Book { Id = 1, Title = $"Title{i}", Author = $"Author{i}", PublicationDate = 1000 + i });
+    await call.RequestStream.WriteAsync(new Book { Id = i, Title = $"Title{i}", Author = $"Author{i}", PublicationDate = 1000 + i });
 }
 
 await call.RequestStream.CompleteAsync();
