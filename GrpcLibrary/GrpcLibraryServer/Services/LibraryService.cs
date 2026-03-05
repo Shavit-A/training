@@ -62,5 +62,25 @@ namespace GrpcLibraryServer.Services
                 Message = "Book removed successfully!"
             });
         }
+
+        public override async Task<Response> BulkAddBooks(IAsyncStreamReader<Book> requestStream, ServerCallContext context)
+        {
+            logger.LogInformation("Bulk Add Books started.");
+
+            int count = 0;
+            await foreach (var book in requestStream.ReadAllAsync())
+            {
+                var newBook = new Models.Book(book.Id, book.Title, book.Author, book.PublicationDate);
+                _books.Add(newBook);
+                count++;
+            }
+
+            logger.LogInformation($"Bulk Add Books completed. Total books added: {count}.");
+            return new Response
+            {
+                Success = true,
+                Message = $"Bulk add completed. Total books added: {count}."
+            };
+        }
     }
 }
