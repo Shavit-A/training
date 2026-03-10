@@ -77,7 +77,7 @@ l_finish:
 Status Stack__pop(Stack* stack, int32_t* value)
 {
     Status status = STATUS_INIT_ERROR;
-    VALIDATE(stack != NULL, STATUS_NULL_POINTER_ERROR, status, l_finish);
+    VALIDATE(stack != NULL, STATUS_NULL_POINTER_ERROR && value != NULL, status, l_finish);
 
     if (stack->top_stack_ptr == stack->start_stack_ptr) {
         status = STATUS_STACK_UNDERFLOW_ERROR;
@@ -88,6 +88,23 @@ Status Stack__pop(Stack* stack, int32_t* value)
     *value = *(stack->top_stack_ptr);
 
     status = STATUS_SUCCESS;
+l_finish:
+    return status;
+}
+
+Status Stack__peek(Stack* stack, int32_t* value)
+{
+    Status status = STATUS_INIT_ERROR;
+    VALIDATE(stack != NULL, STATUS_NULL_POINTER_ERROR && value != NULL, status, l_finish);
+
+    if (stack->top_stack_ptr == stack->start_stack_ptr) {
+        status = STATUS_STACK_UNDERFLOW_ERROR;
+        goto l_finish;
+    }
+
+    *value = *(stack->top_stack_ptr - 1);
+    status = STATUS_SUCCESS;
+
 l_finish:
     return status;
 }

@@ -36,13 +36,13 @@ int main(void)
 
     printf("Popped value: %d\n", value);
 
-    status = Stack__pop(stack, &value);
+    status = Stack__peek(stack, &value);
     if (status != STATUS_SUCCESS) {
-        printf("Failed to pop value from stack. Status code: %d\n", status);
+        printf("Failed to peek value from stack. Status code: %d\n", status);
         return EXIT_FAILURE;
     }
 
-    printf("Popped value: %d\n", value);
+    printf("Peeked value: %d\n", value);
 
     status = Stack__pop(stack, &value);
     if (status != STATUS_SUCCESS) {
