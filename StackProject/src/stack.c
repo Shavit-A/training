@@ -1,6 +1,7 @@
 #include "stack.h"
 #include "validation_utils.h"
 
+#include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 
