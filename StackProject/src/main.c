@@ -51,6 +51,16 @@ int main(void)
     }
 
     printf("Popped value: %d\n", value);
+
+    bool is_empty = false;
+    status = Stack__is_empty(stack, &is_empty);
+    if (status != STATUS_SUCCESS) {
+        printf("Failed to check if stack is empty. Status code: %d\n", status);
+        return EXIT_FAILURE;
+    }
+
+    printf("Is stack empty? %s\n", is_empty ? "Yes" : "No");
+
     printf("Finished running successfully!\n");
     return EXIT_SUCCESS;
 }

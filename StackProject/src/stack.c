@@ -108,3 +108,15 @@ Status Stack__peek(Stack* stack, int32_t* value)
 l_finish:
     return status;
 }
+
+Status Stack__is_empty(Stack* stack, bool* is_empty)
+{
+    Status status = STATUS_INIT_ERROR;
+    VALIDATE(stack != NULL, STATUS_NULL_POINTER_ERROR && is_empty != NULL, status, l_finish);
+
+    *is_empty = (stack->top_stack_ptr == stack->start_stack_ptr);
+    status = STATUS_SUCCESS;
+
+l_finish:
+    return status;
+}
