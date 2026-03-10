@@ -26,9 +26,25 @@ Status Stack__init(Stack **stack)
     (*stack)->top_stack_ptr = (*stack)->start_stack_ptr;
 
     status = STATUS_SUCCESS;
+    goto l_finish;
 
 l_cleanup:
     free(*stack);
+
+l_finish:
+    return status;
+}
+
+Status Stack__free(Stack **stack)
+{
+    Status status = STATUS_INIT_ERROR;
+    VALIDATE(stack != NULL, STATUS_NULL_POINTER_ERROR, status, l_finish);
+
+    free((*stack)->start_stack_ptr);
+    free(*stack);
+    *stack = NULL;
+
+    status = STATUS_SUCCESS;
 
 l_finish:
     return status;
