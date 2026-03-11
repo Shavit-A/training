@@ -6,12 +6,21 @@
 #include <stdbool.h>
 
 typedef struct Stack_t Stack;
-typedef void* StackObject;
+typedef void* ObjectPtr;
 
-Status Stack__init(Stack** stack, uint32_t object_size);
-Status Stack__free(Stack** stack);
+typedef Status (*StackObjectInitCallback)(const ObjectPtr* obj);
+typedef Status (*StackObjectFreeCallback)(ObjectPtr* const obj);
+typedef Status (*StackObjectCopyCallback)(ObjectPtr const dst, const ObjectPtr const src);
 
-Status Stack__push(Stack* stack, StackObject object);
-Status Stack__pop(Stack* stack, StackObject* value);
-Status Stack__peek(Stack* stack, StackObject* value);
-Status Stack__is_empty(Stack* stack, bool* is_empty);
+Status Stack__init(
+    Stack** const stack,
+    StackObjectInitCallback init_callback,
+    StackObjectFreeCallback free_callback,
+    StackObjectCopyCallback copy_callback);
+Status Stack__free(Stack** const stack);
+
+Status Stack__push(Stack* const stack, const ObjectPtr object);
+Status Stack__pop(Stack* const stack,  ObjectPtr const out_object);
+Status Stack__peek(const Stack* const stack, ObjectPtr const out_object);
+Status Stack__is_empty(const Stack* const stack, bool* const is_empty);
+Status Stack__get_size(const Stack* const stack, uint32_t* const size);
