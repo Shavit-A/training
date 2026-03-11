@@ -8,3 +8,10 @@
             goto label; \
         } \
     } while (0)
+
+#define TRACE_ON_FAILURE(condition, message) \
+    do { \
+        if (!(condition)) { \
+            printf("Trace: %s\n", message); \
+        } \
+    } while (0)
