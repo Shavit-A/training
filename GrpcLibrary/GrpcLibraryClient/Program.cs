@@ -1,7 +1,7 @@
 ﻿using Grpc.Net.Client;
-using GrpcLibraryClient;
+using GrpcLibraryConfigs;
 
-using var channel = GrpcChannel.ForAddress("https://localhost:7247");
+using var channel = GrpcChannel.ForAddress("http://localhost:5022");
 var client = new Library.LibraryClient(channel);
 
 var addBookResponse= await client.AddBookAsync(

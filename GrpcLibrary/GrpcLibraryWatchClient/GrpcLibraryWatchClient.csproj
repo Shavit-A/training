@@ -16,8 +16,8 @@
     </PackageReference>
   </ItemGroup>
 
-<ItemGroup>
-	<Protobuf Include="Protos\library.proto" GrpcServices="Client" />
-</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GrpcLibarayConfigs\GrpcLibarayConfigs.csproj" />
+  </ItemGroup>
 
 </Project>

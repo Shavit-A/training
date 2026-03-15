@@ -1,9 +1,9 @@
 ﻿using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
-using GrpcLibraryWatchClient;
+using GrpcLibraryConfigs;
 
-using var channel = GrpcChannel.ForAddress("https://localhost:7247");
+using var channel = GrpcChannel.ForAddress("http://localhost:5022");
 var client = new Library.LibraryClient(channel);
 
 Console.WriteLine("--- Library Watcher ---");

@@ -1,6 +1,7 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using System.Reflection.Metadata.Ecma335;
+using GrpcLibraryConfigs;
 
 namespace GrpcLibraryServer.Services
 {
