@@ -16,21 +16,21 @@ namespace GrpcLibraryServer.Services
             _registry = registry;
         }
 
-        public override Task<Response> AddBook(
+        public override Task<AddBookResponse> AddBook(
             AddBookRequest request,
             ServerCallContext context)
         {
             _logger.LogInformation($"Add Book name: {request.Title}");
             bool isAdded = _registry.AddBook(request.Title, request.Author, request.PublicationDate);
 
-            return Task.FromResult(new Response
+            return Task.FromResult(new AddBookResponse
             {
                 Success = isAdded,
                 Message = isAdded ? "Book added successfully!" : "Failed to add book"
             });
         }
 
-        public override Task<Response> AddReviewToBook(
+        public override Task<AddReviewResponse> AddReviewToBook(
             AddReviewRequest request,
             ServerCallContext context)
         {
@@ -38,28 +38,28 @@ namespace GrpcLibraryServer.Services
 
             bool isReviewAdded = _registry.AddReviewToBook(request.BookId, request.ReviewText);
 
-            return Task.FromResult(new Response
+            return Task.FromResult(new AddReviewResponse
             {
                 Success = isReviewAdded,
                 Message = isReviewAdded ? "Review added successfully!" : $"Book with ID {request.BookId} not found."
             });
         }
 
-        public override Task<Response> RemoveBook(
+        public override Task<RemoveBookResponse> RemoveBook(
             RemoveBookRequest request,
             ServerCallContext context)
         {
             _logger.LogInformation($"Remove Book ID: {request.BookId}");
             bool isRemoved = _registry.RemoveBook(request.BookId);
 
-            return Task.FromResult(new Response
+            return Task.FromResult(new RemoveBookResponse
             {
                 Success = isRemoved,
                 Message = isRemoved ? "Book removed successfully!" : $"Book with ID {request.BookId} not found."
             });
         }
 
-        public override async Task<Response> BulkAddBooks(
+        public override async Task<BulkAddBooksResponse> BulkAddBooks(
             IAsyncStreamReader<AddBookRequest> requestStream,
             ServerCallContext context)
         {
@@ -75,7 +75,7 @@ namespace GrpcLibraryServer.Services
             }
 
             _logger.LogInformation($"Bulk Add Books completed. Total books added: {count}.");
-            return new Response
+            return new BulkAddBooksResponse
             {
                 Success = true,
                 Message = $"Bulk add completed. Total books added: {count}."
@@ -83,8 +83,8 @@ namespace GrpcLibraryServer.Services
         }
 
         public override async Task WatchBooks(
-            Empty request,
-            IServerStreamWriter<Response> responseStream,
+            WatchBooksRequest request,
+            IServerStreamWriter<WatchBooksResponse> requestStream,
             ServerCallContext context)
         {
 
@@ -101,10 +101,11 @@ namespace GrpcLibraryServer.Services
             {
                 await foreach (var book in channel.Reader.ReadAllAsync(context.CancellationToken))
                 {
-                    await responseStream.WriteAsync(new Response
+                    await requestStream.WriteAsync(new WatchBooksResponse
                     {
                         Success = true,
-                        Message = $"New book [{book.Id}] Title: {book.Title}"
+                        Message = $"New book [{book.Id}] Title: {book.Title}",
+                        BookId = book.Id
                     });
                 }
             }

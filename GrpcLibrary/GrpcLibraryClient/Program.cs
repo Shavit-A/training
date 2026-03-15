@@ -6,7 +6,7 @@ var client = new Library.LibraryClient(channel);
 
 var addBookResponse= await client.AddBookAsync(
     new AddBookRequest { Title = "Title1", Author = "Author1", PublicationDate = 1234 });
-Console.WriteLine($"AddBook response - Success status: {addBookResponse.Success}, Message: {addBookResponse.Message}");
+Console.WriteLine($"AddBook response - Success status: {addBookResponse.Success}, BookId: {addBookResponse.BookId} Message: {addBookResponse.Message}");
 
 var AddReviewToBookResponse = await client.AddReviewToBookAsync(new AddReviewRequest { BookId = 1, ReviewText = "Very good!" });
 Console.WriteLine($"Add Review To Book response - Success status: {AddReviewToBookResponse.Success}, Message: {AddReviewToBookResponse.Message}");

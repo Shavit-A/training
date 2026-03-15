@@ -9,13 +9,13 @@ var client = new Library.LibraryClient(channel);
 Console.WriteLine("--- Library Watcher ---");
 Console.WriteLine("Connecting to server and waiting for new books...");
 
-using var call = client.WatchBooks(new Empty());
+using var call = client.WatchBooks(new WatchBooksRequest());
 
 try
 {
     await foreach (var response in call.ResponseStream.ReadAllAsync())
     {
-        Console.WriteLine($"[Update] (status: {response.Success}): {response.Message}");
+        Console.WriteLine($"[Update] (status: {response.Success}): [{response.BookId}] {response.Message}");
     }
 }
 catch (RpcException ex)
