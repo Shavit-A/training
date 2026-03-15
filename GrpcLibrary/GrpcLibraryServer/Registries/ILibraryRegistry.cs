@@ -1,4 +1,6 @@
-﻿using GrpcLibraryServer.Models;
+﻿using GrpcLibraryConfigs;
+using GrpcLibraryServer.Models;
+using System;
 
 namespace GrpcLibraryServer.Registries
 {
@@ -6,7 +8,7 @@ namespace GrpcLibraryServer.Registries
     {
         event Action<Book>? OnBookAdded;
 
-        bool AddBook(Book book);
+        bool AddBook(string title, string author, UInt32 publicationDate);
         bool AddReviewToBook(UInt32 bookId, string review);
         bool RemoveBook(UInt32 bookId);
     }

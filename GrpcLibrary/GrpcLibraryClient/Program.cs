@@ -5,7 +5,7 @@ using var channel = GrpcChannel.ForAddress("http://localhost:5022");
 var client = new Library.LibraryClient(channel);
 
 var addBookResponse= await client.AddBookAsync(
-    new Book { Id = 1, Title = "Title1", Author = "Author1", PublicationDate = 1234 });
+    new AddBookRequest { Title = "Title1", Author = "Author1", PublicationDate = 1234 });
 Console.WriteLine($"AddBook response - Success status: {addBookResponse.Success}, Message: {addBookResponse.Message}");
 
 var AddReviewToBookResponse = await client.AddReviewToBookAsync(new AddReviewRequest { BookId = 1, ReviewText = "Very good!" });
@@ -18,7 +18,7 @@ using var call = client.BulkAddBooks();
 
 for (uint i = 2; i < 5; i++)
 {
-    await call.RequestStream.WriteAsync(new Book { Id = i, Title = $"Title{i}", Author = $"Author{i}", PublicationDate = 1000 + i });
+    await call.RequestStream.WriteAsync(new AddBookRequest { Title = $"Title{i}", Author = $"Author{i}", PublicationDate = 1000 + i });
 }
 
 await call.RequestStream.CompleteAsync();

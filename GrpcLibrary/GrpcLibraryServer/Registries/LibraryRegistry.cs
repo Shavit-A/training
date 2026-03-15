@@ -1,5 +1,6 @@
-﻿using System.Collections.Concurrent;
+﻿using GrpcLibraryConfigs;
 using GrpcLibraryServer.Models;
+using System.Collections.Concurrent;
 
 namespace GrpcLibraryServer.Registries
 {
@@ -7,17 +8,22 @@ namespace GrpcLibraryServer.Registries
     {
         private readonly ConcurrentDictionary<UInt32, Book> _books;
         public event Action<Book>? OnBookAdded;
+        private UInt32 _idCounter;
 
         public LibraryRegistry()
         {
             _books = new ConcurrentDictionary<UInt32, Book>();
+            _idCounter = 0;
         }
 
-        public bool AddBook(Book book)
+        public bool AddBook(string title, string author, UInt32 publicationDate)
         {
-            if (_books.TryAdd(book.Id, book))
+            UInt32 bookId = (UInt32)Interlocked.Increment(ref _idCounter);
+            var newBook = new Book ( bookId, title, author, publicationDate );
+
+            if (_books.TryAdd(bookId, newBook))
             {
-                OnBookAdded?.Invoke(book);
+                OnBookAdded?.Invoke(newBook);
                 return true;
             }
             return false;

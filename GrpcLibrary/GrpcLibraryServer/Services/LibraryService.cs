@@ -2,7 +2,6 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using GrpcLibraryConfigs;
 using GrpcLibraryServer.Registries;
-using Microsoft.Win32;
 
 namespace GrpcLibraryServer.Services
 {
@@ -18,19 +17,16 @@ namespace GrpcLibraryServer.Services
         }
 
         public override Task<Response> AddBook(
-            Book request,
+            AddBookRequest request,
             ServerCallContext context)
         {
             _logger.LogInformation($"Add Book name: {request.Title}");
-
-            var newBook = new Models.Book(
-                request.Id, request.Title, request.Author, request.PublicationDate);
-            bool isAdded = _registry.AddBook(newBook);
+            bool isAdded = _registry.AddBook(request.Title, request.Author, request.PublicationDate);
 
             return Task.FromResult(new Response
             {
                 Success = isAdded,
-                Message = isAdded ? "Book added successfully!" : $"Book with ID {request.Id} already exists."
+                Message = isAdded ? "Book added successfully!" : "Failed to add book"
             });
         }
 
@@ -64,16 +60,15 @@ namespace GrpcLibraryServer.Services
         }
 
         public override async Task<Response> BulkAddBooks(
-            IAsyncStreamReader<Book> requestStream,
+            IAsyncStreamReader<AddBookRequest> requestStream,
             ServerCallContext context)
         {
             _logger.LogInformation("Bulk Add Books started.");
 
             int count = 0;
-            await foreach (var book in requestStream.ReadAllAsync())
+            await foreach (var addBookRequest in requestStream.ReadAllAsync())
             {
-                var newBook = new Models.Book(book.Id, book.Title, book.Author, book.PublicationDate);
-                if (_registry.AddBook(newBook))
+                if (_registry.AddBook(addBookRequest.Title, addBookRequest.Author, addBookRequest.PublicationDate))
                 {
                     count++;
                 }
