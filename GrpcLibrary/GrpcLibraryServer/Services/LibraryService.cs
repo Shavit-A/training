@@ -1,35 +1,36 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-using System.Reflection.Metadata.Ecma335;
 using GrpcLibraryConfigs;
+using GrpcLibraryServer.Registries;
+using Microsoft.Win32;
 
 namespace GrpcLibraryServer.Services
 {
-    public class LibraryService(ILogger<LibraryService> logger) : Library.LibraryBase
+    public class LibraryService : Library.LibraryBase
     {
-        private static List<Models.Book> _books = new List<Models.Book>();
-        private static event Action<Models.Book>? _onBookAdded;
+        private readonly ILogger<LibraryService> _logger;
+        private readonly ILibraryRegistry _registry;
 
-        private void AddBookAndNotify(Models.Book book)
+        public LibraryService(ILogger<LibraryService> logger, ILibraryRegistry registry)
         {
-            _books.Add(book);
-            _onBookAdded?.Invoke(book);
+            _logger = logger;
+            _registry = registry;
         }
 
         public override Task<Response> AddBook(
             Book request,
             ServerCallContext context)
         {
-            logger.LogInformation($"Add Book name: {request.Title}");
+            _logger.LogInformation($"Add Book name: {request.Title}");
 
             var newBook = new Models.Book(
                 request.Id, request.Title, request.Author, request.PublicationDate);
-            AddBookAndNotify(newBook);
+            bool isAdded = _registry.AddBook(newBook);
 
             return Task.FromResult(new Response
             {
-                Success = true,
-                Message = "Book added successfully!"
+                Success = isAdded,
+                Message = isAdded ? "Book added successfully!" : $"Book with ID {request.Id} already exists."
             });
         }
 
@@ -37,23 +38,14 @@ namespace GrpcLibraryServer.Services
             AddReviewRequest request,
             ServerCallContext context)
         {
-            logger.LogInformation($"Add Review to Book ID: {request.BookId}");
+            _logger.LogInformation($"Add Review to Book ID: {request.BookId}");
 
-            var book = _books.FirstOrDefault(b => b.Id == request.BookId);
-            if (book == null)
-            {
-                return Task.FromResult(new Response
-                {
-                    Success = false,
-                    Message = "Book not found!"
-                });
-            }
+            bool isReviewAdded = _registry.AddReviewToBook(request.BookId, request.ReviewText);
 
-            book.AddReview(request.ReviewText);
             return Task.FromResult(new Response
             {
-                Success = true,
-                Message = "Review added successfully!"
+                Success = isReviewAdded,
+                Message = isReviewAdded ? "Review added successfully!" : $"Book with ID {request.BookId} not found."
             });
         }
 
@@ -61,22 +53,13 @@ namespace GrpcLibraryServer.Services
             RemoveBookRequest request,
             ServerCallContext context)
         {
-            logger.LogInformation($"Remove Book ID: {request.BookId}");
-            var book = _books.FirstOrDefault(b => b.Id == request.BookId);
-            if (book == null)
-            {
-                return Task.FromResult(new Response
-                {
-                    Success = false,
-                    Message = "Book not found!"
-                });
-            }
+            _logger.LogInformation($"Remove Book ID: {request.BookId}");
+            bool isRemoved = _registry.RemoveBook(request.BookId);
 
-            _books.Remove(book);
             return Task.FromResult(new Response
             {
-                Success = true,
-                Message = "Book removed successfully!"
+                Success = isRemoved,
+                Message = isRemoved ? "Book removed successfully!" : $"Book with ID {request.BookId} not found."
             });
         }
 
@@ -84,17 +67,19 @@ namespace GrpcLibraryServer.Services
             IAsyncStreamReader<Book> requestStream,
             ServerCallContext context)
         {
-            logger.LogInformation("Bulk Add Books started.");
+            _logger.LogInformation("Bulk Add Books started.");
 
             int count = 0;
             await foreach (var book in requestStream.ReadAllAsync())
             {
                 var newBook = new Models.Book(book.Id, book.Title, book.Author, book.PublicationDate);
-                AddBookAndNotify(newBook);
-                count++;
+                if (_registry.AddBook(newBook))
+                {
+                    count++;
+                }
             }
 
-            logger.LogInformation($"Bulk Add Books completed. Total books added: {count}.");
+            _logger.LogInformation($"Bulk Add Books completed. Total books added: {count}.");
             return new Response
             {
                 Success = true,
@@ -115,7 +100,7 @@ namespace GrpcLibraryServer.Services
                 channel.Writer.TryWrite(book);
             };
 
-            _onBookAdded += bookHandler;
+            _registry.OnBookAdded += bookHandler;
 
             try
             {
@@ -134,7 +119,7 @@ namespace GrpcLibraryServer.Services
             }
             finally
             {
-                _onBookAdded -= bookHandler;
+                _registry.OnBookAdded -= bookHandler;
             }
         }
     }

@@ -1,9 +1,11 @@
 using GrpcLibraryServer.Services;
+using GrpcLibraryServer.Registries;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddGrpc();
+builder.Services.AddSingleton<ILibraryRegistry, LibraryRegistry>();
 
 var app = builder.Build();
 
