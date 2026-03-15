@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+option csharp_namespace = "GrpcLibraryConfigs";
+
+package library;
+
+service Library {
+  rpc AddBook (AddBookRequest) returns (AddBookResponse);
+  rpc AddReviewToBook (AddReviewRequest) returns (AddReviewResponse);
+  rpc RemoveBook (RemoveBookRequest) returns (RemoveBookResponse);
+  rpc BulkAddBooks (stream AddBookRequest) returns (BulkAddBooksResponse);
+  rpc WatchBooks (WatchBooksRequest) returns (stream WatchBooksResponse);
+}
+
+// ---- Add Book ----
+message AddBookRequest {
+  string title = 1;
+  string author = 2;
+  uint32 publication_date = 3;
+}
+
+message AddBookResponse {
+  bool success = 1;
+  string message = 2;
+  uint32 book_id = 3;
+}
+
+// ---- Add Review ----
+message AddReviewRequest {
+  uint32 book_id = 1;
+  string review_text = 2;
+}
+
+message AddReviewResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// ---- Remove Book ----
+message RemoveBookRequest {
+  uint32 book_id = 1;
+}
+
+message RemoveBookResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// ---- Bulk Add ----
+message BulkAddBooksResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// ---- Watch Books ----
+message WatchBooksRequest {
+}
+
+message WatchBooksResponse {
+  bool success = 1;
+  string message = 2;
+  uint32 book_id = 3;
+}
